@@ -17,7 +17,7 @@ contract Asterisk {
 
   // Submitted via user's account
   function join(uint256 identityCommitment) external {
-    // TODO proof of passport
+    // TODO proof of passport is not yet to a usable state
     semaphore.addMember(groupId, identityCommitment);
     // Backup source of group contents in case we don't have time to implement subgraph
     identityCommitments.push(identityCommitment);

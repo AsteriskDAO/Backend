@@ -45,7 +45,7 @@ contract Asterisk {
 
   
   // Each user can submit a report once each day
-  function daysSinceDeployment() internal view returns (uint256) {
+  function daysSinceDeployment() public view returns (uint256) {
     uint256 timeDifference = block.timestamp - deploymentTime;
     return timeDifference / 60 / 60 / 24; // Convert seconds to days
   }

@@ -1,0 +1,16 @@
+{
+  "name": "asterisk-relayer",
+  "version": "0.0.1",
+  "description": "For sending anonymous daily reports without requiring users to manage two accounts",
+  "main": "index.js",
+  "type": "module",
+  "repository": "https://github.com/AsteriskDAO/Backend",
+  "author": "numtel <ben@latenightsketches.com>",
+   "scripts": {
+    "upload": "zip -r archive.zip . && aws s3 cp archive.zip s3://config.clonk.me/relayer-lambda.zip"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.13.1"
+  }
+}

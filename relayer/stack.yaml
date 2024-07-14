@@ -1,0 +1,82 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template to create an S3 bucket, CloudFront, and a Lambda function for file uploads.
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: Name of the S3 bucket to be created.
+    Default: config.clonk.me
+  S3Key:
+    Type: String
+    Description: Filename on s3
+    Default: relayer-lambda.zip
+  PrivateKey:
+    Type: String
+    Description: Filename on s3
+    NoEcho: true
+  ContractAddr:
+    Type: String
+    Description: On Sepolia
+    Default: "0x97762612C906D3dA8a609eF3D2FE24DFe8509479"
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: "LambdaExecutionPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "*"
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref BucketName
+        S3Key: !Ref S3Key
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: nodejs20.x
+      MemorySize: 128 # Adjust as needed
+      Timeout: 60 # Adjust as needed
+      Environment:
+        Variables:
+          PRIVATE_KEY: !Ref PrivateKey
+          CONTRACT_ADDR: !Ref ContractAddr
+
+  LambdaUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn: !GetAtt LambdaFunction.Arn
+      Cors:
+        AllowOrigins:
+          - '*'
+
+  LambdaFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: "lambda:InvokeFunctionUrl"
+      FunctionName: !Ref LambdaFunction
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+
+Outputs:
+  LambdaFunctionUrl:
+    Description: URL for the Lambda function
+    Value: !GetAtt LambdaUrl.FunctionUrl
+

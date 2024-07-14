@@ -23,6 +23,10 @@ contract Asterisk {
     identityCommitments.push(identityCommitment);
   }
 
+  function fetchIdCommitments() external view returns(uint256[] memory) {
+    return identityCommitments;
+  }
+
   // Submitted via relayer anonymously
   function submitReport(
     uint256 merkleTreeDepth,
